@@ -1,0 +1,4 @@
+class Note - common class
+main - default
+Features - additional opportunities
+ 
