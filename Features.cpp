@@ -19,6 +19,7 @@ vector <int> FindWord(string text, string word) {
 	return result;
 	
 }
+
 int CheckBracket(string text) {
 	int balance = 0;
 	int coord = -1;
@@ -42,4 +43,35 @@ int CheckBracket(string text) {
 		return coord;
 	}
 	
+}
+
+bool IsOperation(char ch) {
+	if (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '>' || ch == '>' || ch == '=') {
+		return true;
+	}
+	return false;
+}
+
+string GetSpace(string& text) {
+	for (int i = 0; i < text.length(); i++) {
+		bool isOperation = IsOperation(text[i]);
+		
+		if (isOperation == true) {
+			if (i != text.length() - 1) {
+				bool nextIsOper = IsOperation(text[i + 1]);
+				if (!nextIsOper) {
+					text.insert(i + 1, " ");
+				}
+			}
+			if (i != 0) {
+				bool prevIsOper = IsOperation(text[i - 1]);
+				bool nextIsOper = IsOperation(text[i + 1]);
+				if (prevIsOper == false && nextIsOper == false) {
+					text.insert(i, " ");
+					i++;
+				}
+			}
+		}
+	}
+	return text;
 }
