@@ -3,19 +3,34 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
-
+#include <QTextEdit>
 Note::Note(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::Note)
 {
     ui->setupUi(this);
 
+    find_box=new FindBox(this);
+    find_box->setVisible(false);
+
+
+
     connect(ui->action_Open,SIGNAL(triggered()),this,SLOT(slot_open()));
     connect(ui->action_New,SIGNAL(triggered()),this,SLOT(slot_new()));
     connect(ui->action_Save,SIGNAL(triggered()),this,SLOT(slot_save()));
+    connect(ui->action_Find_word,SIGNAL(triggered()),this,SLOT(find()));
 
     connect(ui->plainTextEdit,SIGNAL(modificationChanged(bool)),this,SLOT(setWindowModified(bool)));
+    connect(find_box->get_line(),SIGNAL(textChanged(QString)),this,SLOT(select_word()));
 
+
+    //ShortKey
+
+    ui->action_Find_word->setShortcut(Qt::CTRL + Qt::Key_F);
+
+    QHBoxLayout* lay = new QHBoxLayout;
+    lay->addWidget(find_box);
+    ui->verticalLayout->addLayout(lay);
     slot_new();
 }
 
@@ -26,11 +41,40 @@ Note::~Note()
 
 void Note::find()
 {
-    //
+
+    find_box->setVisible(true);
+    find_box->get_line()->setFocus();
+    find_box->get_line()->selectAll();
+}
+
+void Note::select_word()
+{
+    QString line = find_box->get_line()->text();
+    QString Text = ui->plainTextEdit->toPlainText();
+    if(line.isEmpty() || line.length()>Text.length()){
+        return;
+    }
+    std::vector<int> pos= FindWord(Text.toStdString(),line.toStdString());
+
+    QTextCursor cursor = ui->plainTextEdit->textCursor();
+
+    if(pos[0]==-1){
+        cursor.clearSelection();
+        return;
+    }
+    // выделили текст и установили выделение желтым
+    cursor.select(QTextCursor::Document);
+    ui->plainTextEdit->setStyleSheet("selection-background-color: blue");
+    ui->plainTextEdit->setTextCursor(cursor);
+
+    cursor.setPosition(pos[0]);
+    cursor.setPosition(pos[0]+find_box->get_line()->text().length(),QTextCursor::MoveMode::KeepAnchor);
+    ui->plainTextEdit->setTextCursor(cursor);
 }
 
 void Note::slot_open()
 {
+
     QString IFileName = QFileDialog::getOpenFileName(this,"Open file..",QDir::homePath(),"Text files (*.txt);;All files (*.*)");//
     if(IFileName.isEmpty()){
         return;

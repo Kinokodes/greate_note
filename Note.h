@@ -5,7 +5,7 @@
 #include "Features.h"
 #include <string>
 #include <QFile>
-
+#include "findbox.h"
 namespace Ui {
 class Note;
 }
@@ -20,6 +20,7 @@ public:
 
 public slots:
     void find();
+    void select_word();
     void slot_open();
     void slot_new();
     void slot_save();
@@ -28,6 +29,7 @@ public slots:
 private:
     bool ask_save_or_close();
 private:
+    FindBox* find_box;
     QString FileName;
     Ui::Note *ui;
 };
