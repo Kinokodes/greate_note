@@ -1,4 +1,4 @@
-class Note - common class
+class Note - base class
+class findbox - class for finding words on the text
 main - default
 Features - additional opportunities
- 
